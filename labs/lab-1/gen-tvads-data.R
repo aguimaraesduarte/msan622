@@ -1,3 +1,5 @@
+library(reshape2)
+
 set.seed(23)
 # creating a vector of time from 8am to 9am
 a <- 5
@@ -48,3 +50,4 @@ write.csv(d, "fake-tvads-data.csv", quote=FALSE)
 
 d2 <- melt(d, id.vars = "date")
 
+write.csv(d2, "fake-tvads-data.csv", quote=FALSE)
