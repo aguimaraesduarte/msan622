@@ -40,7 +40,7 @@ ui <- fluidPage(
                 min = 1962, max = 2014, value = 1998, sep = "",
                 animate = animationOptions(interval = 100)),
     sliderInput('pop_size', "Population",
-                min = 500, max = 5000, value = 3000, step = 500, sep = "")
+                min = 500, max = 5000, value = 3000, step = 500, sep = "", ticks = F)
   ),
   mainPanel(
     ggvisOutput("plot"),
