@@ -2,7 +2,7 @@ library(shiny)
 library(reshape2)
 library(ggvis)
 
-setwd("~/Documents/Module5/msan622/homework/hw2/")
+setwd("~/Documents/Module5/msan622/WorldBank-Shiny/")
 
 # Read data
 df <- read.csv("WorldBankData.csv", stringsAsFactors = F)
@@ -35,12 +35,12 @@ regions <- append(regions, "All", 0)
 ui <- fluidPage(
   headerPanel("Gapminder Interactive Plot"),
   sidebarPanel(width = 3,
-               selectInput("region", "Select Region", regions),
-               sliderInput("year", "Select Year",
-                           min = 1962, max = 2014, value = 1998, sep = "",
-                           animate = animationOptions(interval = 100)),
-               sliderInput('pop_size', "Population",
-                           min = 500, max = 5000, value = 3000, step = 500, sep = "")
+    selectInput("region", "Select Region", regions),
+    sliderInput("year", "Select Year",
+                min = 1962, max = 2014, value = 1998, sep = "",
+                animate = animationOptions(interval = 100)),
+    sliderInput('pop_size', "Population",
+                min = 500, max = 5000, value = 3000, step = 500, sep = "")
   ),
   mainPanel(
     ggvisOutput("plot"),
