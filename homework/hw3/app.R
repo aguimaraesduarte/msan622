@@ -2,8 +2,9 @@ library(shiny)
 library(ggplot2)
 library(reshape2)
 library(lubridate)
+library(GGally)
 
-setwd("~/Desktop/Facebook_metrics/")
+setwd("~/Desktop/msan622/homework/hw3/")
 
 facebook <- read.csv("dataset_Facebook.csv", sep = ";", stringsAsFactors = F)
 facebook <- facebook[complete.cases(facebook),]
@@ -55,6 +56,15 @@ ui <- fluidPage(
                                                names(sapply(facebook, is.numeric))[sapply(facebook, is.numeric)],
                                                multiple = T, selected = c("Page.total.likes", "Lifetime.Post.Total.Reach")),
                                 selectInput("scatter_color", "Select color variable",
+                                            names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]))
+  ),
+  
+  conditionalPanel("input.conditionedPanels==3",
+                   sidebarPanel(width = 3,
+                                selectizeInput("parallel_cols", "Select parallel variables to plot",
+                                               colnames(facebook), multiple = T,
+                                               selected = c("Page.total.likes", "Lifetime.Post.Total.Reach")),
+                                selectInput("parallel_color", "Select color variable",
                                             names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]))
   ),
   
@@ -137,28 +147,10 @@ server <- function(input, output, session) {
   ##################
   
   output$parallel_plot <- renderPlot({
-    ggplot(facebook) +
-      #geom_segment(aes(x=0.6, xend=1.6, y=X5YR_, yend=X10YR_), size=1, color="grey70") +
-      #geom_segment(aes(x=1.85, xend=2.85, y=X10YR_, yend=X20YR_), size=1, color="grey70") +
-      
-      #geom_text(label=facebook$CancerType, y=df$X5YR_, x=rep.int(0.2, nrow(df)), size=4) +
-      #geom_text(label=df$X5YR, y=df$X5YR_, x=rep.int(0.5, nrow(df)), size=4) +
-      #geom_text(label=df$X10YR, y=df$X10YR_, x=rep.int(1.72, nrow(df)), size=4) +
-      #geom_text(label=df$X20YR, y=df$X20YR_, x=rep.int(2.97, nrow(df)), size=4) +
-      
-      #geom_text(label="5 years", y=103, x=0.5, size=5) +
-      #geom_text(label="10 years", y=103, x=1.72, size=5) +
-      #geom_text(label="20 years", y=103, x=2.97, size=5) +
-      
-      #xlab("") + ylab("") + 
-      #xlim(0, 3) +
-      #ylim(0, 105) +
-      
-      theme(panel.background = element_blank(),
-            panel.grid=element_blank(),
-            axis.ticks=element_blank(),
-            axis.text=element_blank(),
-            panel.border = element_rect(colour = "black", fill=NA, size=1))
+    ggparcoord(facebook, columns = which(colnames(facebook) %in% input$parallel_cols),
+               groupColumn = which(colnames(facebook) == input$parallel_color),
+               scale = "uniminmax", showPoints = T) +
+      theme_bw()
   })
   
 }
