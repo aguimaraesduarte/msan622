@@ -1,10 +1,23 @@
-library(shiny)
-library(ggplot2)
-library(reshape2)
-library(lubridate)
-library(GGally)
-
-setwd("~/Desktop/msan622/homework/hw3/")
+if(!"shiny" %in% rownames(installed.packages())){
+  install.packages("shiny", dependencies = T)
+}
+library("shiny")
+if(!"ggplot2" %in% rownames(installed.packages())){
+  install.packages("ggplot2", dependencies = T)
+}
+library("ggplot2")
+if(!"reshape2" %in% rownames(installed.packages())){
+  install.packages("reshape2", dependencies = T)
+}
+library("reshape2")
+if(!"lubridate" %in% rownames(installed.packages())){
+  install.packages("lubridate", dependencies = T)
+}
+library("lubridate")
+if(!"GGally" %in% rownames(installed.packages())){
+  install.packages("GGally", dependencies = T)
+}
+library("GGally")
 
 facebook <- read.csv("dataset_Facebook.csv", sep = ";", stringsAsFactors = F)
 facebook <- facebook[complete.cases(facebook),]
