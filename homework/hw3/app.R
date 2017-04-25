@@ -16,6 +16,8 @@ facebook$Post.Weekday <- factor(facebook$Post.Weekday, levels = 1:7,
                                 labels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
                                            "Saturday", "Sunday"), ordered = T)
 facebook$Post.Hour <- factor(facebook$Post.Hour, levels = 1:23, labels = 1:23, ordered = T)
+factor_names <- names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]
+numeric_names <- names(sapply(facebook, is.numeric))[sapply(facebook, is.numeric)]
 
 # scatterplot matrix
 # https://gastonsanchez.wordpress.com/2012/08/27/scatterplot-matrices-with-ggplot/
@@ -45,18 +47,17 @@ ui <- fluidPage(
                    sidebarPanel(width = 3,
                                 selectInput("x_axis", "Select X Axis", colnames(facebook), selected = "Post.Hour"),
                                 selectInput("y_axis", "Select Y Axis", colnames(facebook)),
-                                selectInput("color", "Select color variable", colnames(facebook), selected = "Category"),
-                                selectInput("size", "Select size variable", colnames(facebook), selected = "Type"),
-                                sliderInput("bubble_size", "Change size of bubbles", 1, 15, 10, 1, ticks = F))
+                                selectInput("color", "Select color variable", factor_names, selected = "Category"),
+                                selectInput("size", "Select size variable", factor_names, selected = "Type"),
+                                sliderInput("bubble_size", "Change size of bubbles", 1, 15, c(2, 10), 1, ticks = F),
+                                sliderInput("transparency", "Change transparency of bubbles", 0, 1, .75, .05, ticks = T))
   ),
   
   conditionalPanel("input.conditionedPanels==2",
                    sidebarPanel(width = 3,
-                                selectizeInput("scatter_cols", "Select variables to plot",
-                                               names(sapply(facebook, is.numeric))[sapply(facebook, is.numeric)],
+                                selectizeInput("scatter_cols", "Select variables to plot", numeric_names,
                                                multiple = T, selected = c("Page.total.likes", "Lifetime.Post.Total.Reach")),
-                                selectInput("scatter_color", "Select color variable",
-                                            names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]))
+                                selectInput("scatter_color", "Select color variable", factor_names))
   ),
   
   conditionalPanel("input.conditionedPanels==3",
@@ -66,8 +67,7 @@ ui <- fluidPage(
                                                selected = c("Page.total.likes", "Lifetime.Post.Total.Reach")),
                                 strong("Do not select the color variable within the plot variables."),
                                 br(),br(),
-                                selectInput("parallel_color", "Select color variable",
-                                            names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]))
+                                selectInput("parallel_color", "Select color variable", factor_names))
   ),
   
   mainPanel(
@@ -81,7 +81,7 @@ ui <- fluidPage(
                plotOutput("scatter_plot"),
                value = 2),
       tabPanel("Parallel coordinates plot",
-               plotOutput("parallel_plot", brush = brushOpts("plot_brush", resetOnNew=T)),
+               plotOutput("parallel_plot"),
                value = 3),
       id = "conditionedPanels"
     )
@@ -101,8 +101,8 @@ server <- function(input, output, session) {
                                 y=input$y_axis,
                                 color=input$color,
                                 size=input$size)) +
-      geom_point() +
-      scale_size_discrete(range = c(1, input$bubble_size)) +
+      geom_point(alpha = input$transparency) +
+      scale_size_discrete(range = input$bubble_size) +
       theme_bw()
   })
   
