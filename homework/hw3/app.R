@@ -64,6 +64,8 @@ ui <- fluidPage(
                                 selectizeInput("parallel_cols", "Select parallel variables to plot",
                                                colnames(facebook), multiple = T,
                                                selected = c("Page.total.likes", "Lifetime.Post.Total.Reach")),
+                                strong("Do not select the color variable within the plot variables."),
+                                br(),br(),
                                 selectInput("parallel_color", "Select color variable",
                                             names(sapply(facebook, is.factor))[sapply(facebook, is.factor)]))
   ),
@@ -79,7 +81,7 @@ ui <- fluidPage(
                plotOutput("scatter_plot"),
                value = 2),
       tabPanel("Parallel coordinates plot",
-               plotOutput("parallel_plot"),
+               plotOutput("parallel_plot", brush = brushOpts("plot_brush", resetOnNew=T)),
                value = 3),
       id = "conditionedPanels"
     )
@@ -147,10 +149,17 @@ server <- function(input, output, session) {
   ##################
   
   output$parallel_plot <- renderPlot({
+    validate(
+      need(length(input$parallel_cols) >= 2, label = "At least 2 variables")
+    )
+    
     ggparcoord(facebook, columns = which(colnames(facebook) %in% input$parallel_cols),
                groupColumn = which(colnames(facebook) == input$parallel_color),
                scale = "uniminmax", showPoints = T) +
-      theme_bw()
+      theme_bw() +
+      theme(axis.title.y = element_blank(),
+            axis.ticks.y = element_blank(),
+            axis.text.y = element_blank())
   })
   
 }
